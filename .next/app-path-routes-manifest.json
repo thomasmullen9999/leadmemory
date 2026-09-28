@@ -1,0 +1,16 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/ai/suggest-followup/route": "/api/ai/suggest-followup",
+  "/api/auth/[...nextauth]/route": "/api/auth/[...nextauth]",
+  "/api/clients/[id]/route": "/api/clients/[id]",
+  "/api/clients/route": "/api/clients",
+  "/api/deals/[id]/route": "/api/deals/[id]",
+  "/api/deals/route": "/api/deals",
+  "/clients/[id]/page": "/clients/[id]",
+  "/clients/page": "/clients",
+  "/dashboard/page": "/dashboard",
+  "/favicon.ico/route": "/favicon.ico",
+  "/login/page": "/login",
+  "/page": "/"
+}
