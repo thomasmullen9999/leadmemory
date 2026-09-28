@@ -1,99 +1,222 @@
 # LeadMemory
 
-A lightweight CRM for tracking clients, deals, and follow-ups — built to mirror real production CRM work (client management, pipeline tracking, role-based access, and AI-assisted follow-ups).
+LeadMemory is a Next.js application for managing claim enquiries, claimant records, and internal case work.
 
-## Tech Stack
+Members of the public can submit an enquiry through the "Start a claim" form. New enquiries are added to the internal dashboard, where staff can review claimant details, record notes, create cases, and track progress.
 
-- **Next.js 15** (App Router) + **TypeScript**
-- **Prisma** + **PostgreSQL**
-- **NextAuth.js** (credentials-based auth, JWT sessions, role-based access)
-- **Tailwind CSS**
-- **Recharts** (pipeline analytics)
-- **OpenAI API** (AI-generated follow-up suggestions)
+The project began as a lightweight CRM and was adapted into a claim-management style application.
 
 ## Features
 
-- **Client management** — create, view, and track clients with contact details
-- **Deal pipeline** — track deals per client through stages (Lead → Contacted → Negotiating → Won/Lost)
-- **Role-based access** — Admins see all clients; Sales Reps only see their own
-- **Dashboard analytics** — active pipeline value, deals won this month, deals-by-stage chart
-- **Notes** — a running log per client
-- **AI follow-up suggestions** — generates a short, context-aware follow-up message based on a client's recent deals and notes, using the OpenAI API
+- Public claim enquiry form
+- Claimant records with contact and enquiry details
+- Internal dashboard for staff
+- Claim status tracking
+- Case pipeline tracking
+- Role-based access for Admin and Sales Rep accounts
+- Client notes
+- Follow-up suggestions generated with the OpenAI API
+- Dashboard charts using Recharts
+- PostgreSQL database managed with Prisma
 
-## Getting Started Locally
+## Tech stack
 
-### 1. Install dependencies
+- Next.js 15 with the App Router
+- TypeScript
+- Prisma
+- PostgreSQL
+- NextAuth.js
+- Tailwind CSS
+- Recharts
+- OpenAI API
+
+## Running the project locally
+
+### Install dependencies
 
 ```bash
 npm install
 ```
 
-### 2. Set up your database
+### Set up environment variables
 
-You'll need a PostgreSQL database. The easiest free options are:
-- [Supabase](https://supabase.com) (free tier includes a Postgres database)
-- [Neon](https://neon.tech) (free tier, serverless Postgres)
-- Or a local Postgres install if you prefer
-
-Copy the example env file and fill in your own values:
+Create a local environment file from the example:
 
 ```bash
 cp .env.example .env
 ```
-Then edit `.env`:
-- `DATABASE_URL` — your Postgres connection string from Supabase/Neon
-- `NEXTAUTH_SECRET` — generate one with `openssl rand -base64 32`
-- `NEXTAUTH_URL` — `http://localhost:3000` for local dev
-- `OPENAI_API_KEY` — your own OpenAI API key (only needed for the AI follow-up feature; the rest of the app works without it)
 
-### 3. Run migrations and seed the database
+Add values for the following variables:
+
+```env
+DATABASE_URL=
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=http://localhost:3000
+OPENAI_API_KEY=
+```
+
+`OPENAI_API_KEY` is only needed for the follow-up suggestion feature. The rest of the application can run without it.
+
+You can generate a value for `NEXTAUTH_SECRET` with:
 
 ```bash
-npx prisma migrate dev --name init
+openssl rand -base64 32
+```
+
+### Create the database
+
+The project uses PostgreSQL. You can use a local PostgreSQL installation or a hosted provider such as:
+
+- [Supabase](https://supabase.com)
+- [Neon](https://neon.tech)
+
+Once `DATABASE_URL` is set, run the database migration:
+
+```bash
+npx prisma migrate dev
+```
+
+Generate the Prisma client if it does not happen automatically:
+
+```bash
+npx prisma generate
+```
+
+### Add demo data
+
+Run the seed script:
+
+```bash
 npm run db:seed
 ```
 
-This creates the schema and adds two demo accounts with sample clients/deals:
-- `admin@leadmemory.dev` (Admin role — sees everything)
-- `rep@leadmemory.dev` (Sales Rep role — sees only their own clients)
-- Password for both: `password123`
+This creates example staff accounts and sample claimant data.
 
-### 4. Run the dev server
+Demo accounts:
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | `admin@leadmemory.dev` | `password123` |
+| Sales Rep | `rep@leadmemory.dev` | `password123` |
+
+These credentials are for local development only.
+
+### Start the development server
 
 ```bash
 npm run dev
 ```
 
-Visit `http://localhost:3000` — you'll be redirected to `/login`.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Deploying
+Staff users can log in through:
 
-The intended deployment path is **Vercel** (for the app) + **Supabase or Neon** (for the database):
-
-1. Push this repo to GitHub
-2. Import it into Vercel
-3. Add the same environment variables from `.env` into Vercel's project settings
-4. Vercel will build and deploy automatically on push
-
-Remember to run `npx prisma migrate deploy` against your production database once, either via a build step or manually, before the app can read/write data.
-
-## Project Structure
-
+```txt
+/login
 ```
+
+The public enquiry form is available at:
+
+```txt
+/start-a-claim
+```
+
+## Claim enquiry flow
+
+1. A visitor opens the Start a claim page.
+2. They complete contact, claim, and consent details.
+3. LeadMemory creates a claimant record.
+4. The enquiry is assigned to an Admin user.
+5. Staff can view the enquiry in the Dashboard and Claimants pages.
+6. Staff can add notes, create internal cases, and monitor progress.
+
+Submitting an enquiry does not guarantee eligibility, acceptance, compensation, or a successful outcome.
+
+## Staff roles
+
+### Admin
+
+Admins can view all claimant records, cases, notes, and dashboard information.
+
+### Sales Rep
+
+Sales Reps can only view claimants assigned to their own account.
+
+## Project structure
+
+```txt
 src/
   app/
-    api/           - API routes (clients, deals, auth, AI suggestions)
-    clients/       - Clients list + client detail pages
-    dashboard/     - Dashboard with pipeline analytics
-    login/         - Login page
-  components/      - Shared UI components
-  lib/             - Prisma client + NextAuth config
-  types/           - TypeScript type augmentation for NextAuth
+    api/
+      auth/
+      claim-enquiries/
+      clients/
+      deals/
+    clients/
+      [id]/
+      page.tsx
+    dashboard/
+      page.tsx
+    start-a-claim/
+      page.tsx
+    login/
+      page.tsx
+  components/
+    ClaimEnquiryForm.tsx
+    DealList.tsx
+    FollowUpSuggestion.tsx
+    NavBar.tsx
+    PipelineChart.tsx
+  lib/
+    auth.ts
+    prisma.ts
+  types/
+    next-auth.d.ts
+
 prisma/
-  schema.prisma    - Database schema
-  seed.ts          - Seed script with demo data
+  schema.prisma
+  seed.ts
 ```
 
-## Notes on Scope
+## Deployment
 
-This is a portfolio project demonstrating full-stack CRM functionality: relational data modelling, authentication with role-based access control, CRUD operations, dashboard analytics, and a third-party AI API integration. It intentionally keeps scope focused rather than attempting every feature a production CRM might have (e.g. no email sending, no billing, no multi-tenancy).
+LeadMemory can be deployed with Vercel and a hosted PostgreSQL database.
+
+A typical setup is:
+
+- Vercel for the Next.js application
+- Supabase or Neon for PostgreSQL
+- Environment variables configured in the Vercel project settings
+
+Before deploying, add these environment variables to Vercel:
+
+```env
+DATABASE_URL=
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=
+OPENAI_API_KEY=
+```
+
+Run the production migration against the production database:
+
+```bash
+npx prisma migrate deploy
+```
+
+## Scope
+
+LeadMemory is a portfolio project built to demonstrate:
+
+- Next.js App Router development
+- TypeScript
+- Prisma data modelling
+- PostgreSQL integration
+- Authentication and role-based access
+- Form validation
+- Public form submissions
+- Internal dashboards
+- CRUD operations
+- API route handling
+- Third-party API integration
+
+It is not intended to be used as a real financial claims service without further work around legal compliance, privacy documentation, consent records, data retention, security review, rate limiting, spam prevention, and formal user support processes.
