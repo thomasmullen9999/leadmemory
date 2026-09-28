@@ -92,6 +92,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../../src/app/start-a-claim/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/start-a-claim">> = Specific
+  const handler = {} as typeof import("../../../src/app/start-a-claim/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../../src/app/api/ai/suggest-followup/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/ai/suggest-followup">> = Specific
@@ -105,6 +114,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/auth/[...nextauth]">> = Specific
   const handler = {} as typeof import("../../../src/app/api/auth/[...nextauth]/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../../src/app/api/claim-enquiries/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/claim-enquiries">> = Specific
+  const handler = {} as typeof import("../../../src/app/api/claim-enquiries/route.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check

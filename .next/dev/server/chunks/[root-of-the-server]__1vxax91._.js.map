@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 88, "column": 0}, "map": {"version":3,"sources":["file:///Users/thomasmullen/Downloads/Career/Projects/leadmemory/proxy.ts"],"sourcesContent":["export default function proxy() {\n  return;\n}"],"names":["proxy"],"mappings":";;;;AAAe,SAASA;IACtB;AACF"}}]
+}
