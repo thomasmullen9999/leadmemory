@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 28, "column": 0}, "map": {"version":3,"sources":["file:///Users/thomasmullen/Downloads/Career/Projects/leadmemory/src/middleware.ts"],"sourcesContent":["export { default } from \"next-auth/middleware\";\n\n// Any route matched here requires a signed-in session.\n// Unauthenticated users are redirected to /login automatically.\nexport const config = {\n  matcher: [\"/dashboard/:path*\", \"/clients/:path*\"],\n};\n"],"names":["config","matcher"],"mappings":";;;;AAAA;;AAIO,MAAMA,SAAS;IACpBC,SAAS;QAAC;QAAqB;KAAkB;AACnD"}}]
-}
