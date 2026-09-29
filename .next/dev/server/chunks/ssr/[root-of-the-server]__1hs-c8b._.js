@@ -114,6 +114,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__
 ;
 ;
 const authOptions = {
+    secret: process.env.NEXTAUTH_SECRET,
     session: {
         strategy: "jwt"
     },
@@ -134,26 +135,63 @@ const authOptions = {
                 }
             },
             async authorize (credentials) {
-                if (!credentials?.email || !credentials?.password) return null;
-                const user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
-                    where: {
-                        email: credentials.email
-                    }
+                const email = typeof credentials?.email === "string" ? credentials.email.trim().toLowerCase() : "";
+                const password = typeof credentials?.password === "string" ? credentials.password : "";
+                console.log("Login attempt received", {
+                    email,
+                    hasPassword: Boolean(password),
+                    hasDatabaseUrl: Boolean(process.env.DATABASE_URL),
+                    hasNextAuthSecret: Boolean(process.env.NEXTAUTH_SECRET),
+                    nodeEnvironment: ("TURBOPACK compile-time value", "development")
                 });
-                if (!user) return null;
-                const valid = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$bcryptjs$2f$index$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].compare(credentials.password, user.passwordHash);
-                if (!valid) return null;
-                return {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    role: user.role
-                };
+                if (!email || !password) {
+                    console.log("Login rejected: missing email or password.");
+                    return null;
+                }
+                try {
+                    const user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
+                        where: {
+                            email
+                        }
+                    });
+                    if (!user) {
+                        console.log("Login rejected: user was not found.", {
+                            email
+                        });
+                        return null;
+                    }
+                    console.log("User found during login attempt", {
+                        id: user.id,
+                        email: user.email,
+                        role: user.role,
+                        hasPasswordHash: Boolean(user.passwordHash)
+                    });
+                    const validPassword = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$bcryptjs$2f$index$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].compare(password, user.passwordHash);
+                    if (!validPassword) {
+                        console.log("Login rejected: password comparison failed.", {
+                            email
+                        });
+                        return null;
+                    }
+                    console.log("Login accepted.", {
+                        id: user.id,
+                        email: user.email,
+                        role: user.role
+                    });
+                    return {
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                        role: user.role
+                    };
+                } catch (error) {
+                    console.error("Unexpected error during credentials login:", error);
+                    return null;
+                }
             }
         })
     ],
     callbacks: {
-        // Attach role and id to the JWT so we can read it on the client/server
         async jwt ({ token, user }) {
             if (user) {
                 token.id = user.id;
